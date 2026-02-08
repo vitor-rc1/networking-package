@@ -33,7 +33,15 @@ public final class NetworkService: NetworkServiceProtocol {
         }
         
         if let queryItems = endpoint.queryItems, !queryItems.isEmpty {
-            url.append(queryItems: queryItems)
+            if #available(iOS 16.0, *) {
+                url.append(queryItems: queryItems)
+            } else {
+                var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+                components?.queryItems = queryItems
+                if let updatedURL = components?.url {
+                    url = updatedURL
+                }
+            }
         }
         
         var request = URLRequest(url: url)
