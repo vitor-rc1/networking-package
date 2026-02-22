@@ -8,7 +8,7 @@
     
 import Foundation
 
-public protocol APIEndpointProtocol {
+public protocol APIEndpointProtocol: Sendable {
     var baseURL: String { get }
     var path: String { get }
     var method: HTTPMethod { get }

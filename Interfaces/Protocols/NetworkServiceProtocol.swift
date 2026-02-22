@@ -8,6 +8,7 @@
     
 import Foundation
 
-public protocol NetworkServiceProtocol {
-    func request(endpoint: APIEndpointProtocol) async throws ->  (Data, HTTPURLResponse)
+public protocol NetworkServiceProtocol: Sendable {
+    @concurrent
+    func request(endpoint: APIEndpointProtocol) async throws(NetworkError) ->  (Data, HTTPURLResponse)
 }
