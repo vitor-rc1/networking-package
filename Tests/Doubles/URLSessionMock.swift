@@ -9,13 +9,13 @@
 import Foundation
 @testable import Networking
 
-final class URLSessionMock: URLSessionInterface {
-    enum Methods {
+actor URLSessionMock: URLSessionInterface {
+    enum Methods: Sendable {
         case data
     }
     
-    var calledMethods: [Methods] = []
-    
+    private(set) var calledMethods: [Methods] = []
+
     var urlRequestPassed: URLRequest?
     var dataTobeReturned: Data?
     var urlResponseToBeReturned: URLResponse?
@@ -29,5 +29,17 @@ final class URLSessionMock: URLSessionInterface {
         }
         return (dataTobeReturned ?? Data(),
                 urlResponseToBeReturned ?? URLResponse())
+    }
+
+    func setUrlResponseToBeReturned(_ urlResponseToBeReturned: URLResponse?) async {
+        self.urlResponseToBeReturned = urlResponseToBeReturned
+    }
+
+    func setDataTobeReturned(_ dataTobeReturned: Data?) async {
+        self.dataTobeReturned = dataTobeReturned
+    }
+
+    func setshouldThrowError(_ shouldThrowError: Bool) async {
+        self.shouldThrowError = shouldThrowError
     }
 }

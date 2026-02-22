@@ -39,21 +39,21 @@ struct NetworkServiceTests {
             body: body,
             queryItems: queryItems)
         let url = try #require(URL(string: "https://example.com/my-path?key=value"))
-        urlSessionMock.urlResponseToBeReturned = HTTPURLResponse(url: url,
-                                                                         statusCode: 200,
-                                                                         httpVersion: nil,
-                                                                         headerFields: nil)
-        urlSessionMock.dataTobeReturned = "Bla".data(using: .utf8)
+        await urlSessionMock.setUrlResponseToBeReturned(HTTPURLResponse(url: url,
+                                                                        statusCode: 200,
+                                                                        httpVersion: nil,
+                                                                        headerFields: nil))
+        await urlSessionMock.setDataTobeReturned("Bla".data(using: .utf8))
         var expectedURLRequest = URLRequest(url: url)
         expectedURLRequest.allHTTPHeaderFields = ["Content-Type": "application/json"]
         
         let (data, _) = try await sut.request(endpoint: validEndpoint)
         let result = String(data: data, encoding: .utf8)
         
-        #expect(urlSessionMock.calledMethods == [.data])
+        #expect(await urlSessionMock.calledMethods == [.data])
         #expect(result == "Bla")
-        #expect(urlSessionMock.urlRequestPassed == expectedURLRequest)
-        #expect(urlSessionMock.urlRequestPassed?.httpBody == body)
+        #expect(await urlSessionMock.urlRequestPassed == expectedURLRequest)
+        #expect(await urlSessionMock.urlRequestPassed?.httpBody == body)
     }
     
     @Test("GIVEN a invalid response WHEN request is made THEN it throws invalidResponse error")
@@ -78,7 +78,7 @@ struct NetworkServiceTests {
             path: "/my-path",
             method: .get
         )
-        urlSessionMock.shouldThrowError = true
+        await urlSessionMock.setshouldThrowError(true)
         let expectedError = NSError(domain: "", code: 500, userInfo: nil)
         await #expect(throws: NetworkError.requestFailed(expectedError)) {
             try await sut.request(endpoint: validEndpoint)

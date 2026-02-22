@@ -9,7 +9,7 @@
 import NetworkingInterfaces
 import Foundation
 
-public protocol URLSessionInterface {
+public protocol URLSessionInterface: Sendable {
     func data(for request: URLRequest,
               delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse)
 }
@@ -26,7 +26,8 @@ public final class NetworkService: NetworkServiceProtocol {
         self.session = session
     }
 
-    public func request(endpoint: APIEndpointProtocol) async throws -> (Data, HTTPURLResponse) {
+    @concurrent
+    public func request(endpoint: APIEndpointProtocol) async throws(NetworkError) -> (Data, HTTPURLResponse) {
         let fullPath = endpoint.baseURL + endpoint.path
         guard var url = URL(string: fullPath) else {
             throw NetworkError.invalidURL
